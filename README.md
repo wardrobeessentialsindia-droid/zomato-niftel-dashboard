@@ -1,4 +1,4 @@
-# Zomato Operations Control Tower — Vercel Only
+# Zomato Niftel Dashboard — Vercel Only
 
 This version has **no Apps Script, no API routes, and no environment variables**.
 
