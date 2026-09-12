@@ -1,0 +1,59 @@
+name: Fix dashboard date handling
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Patch date handling
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          if 'function displayDate(v)' not in s:
+              s = s.replace(
+                  'function rating(v){',
+                  "function displayDate(v){const k=dateKey(v);if(!k)return '';const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const a=k.split('-');if(a.length!==3)return k;return `${a[2]} ${m[Number(a[1])-1]} ${a[0]}`}\n\nfunction rating(v){",
+                  1
+              )
+
+          s = s.replace(
+              "$('dateF').innerHTML='<option value=\"\">All Dates</option>'+dates.map(x=>`<option value=\"${esc(x)}\">${esc(x)}</option>`).join('');",
+              "$('dateF').innerHTML='<option value=\"\">All Dates</option>'+dates.map(x=>`<option value=\"${esc(x)}\">${esc(displayDate(x))}</option>`).join('');",
+              1
+          )
+
+          start = s.find('async function uploadFiles(){')
+          end = s.find('\n\nfunction setStatus', start)
+          if start >= 0 and end > start and 'Updated ${updatedC}' not in s[start:end]:
+              new_upload = '''async function uploadFiles(){const cf=$('customerFile').files[0],lf=$('loginFile').files[0];if(!cf&&!lf){setStatus('Please select at least one dump first.',true);return}setStatus('Reading dump(s) locally…');try{const [cwb,lwb]=await Promise.all([cf?readFile(cf):Promise.resolve(null),lf?readFile(lf):Promise.resolve(null)]);let customer=[],login=[],agents={};if(cwb){const p=parseCustomer(cwb);customer=p.C;agents=p.agents;const autoLogin=parseLogin(cwb);if(autoLogin.length)login=autoLogin}if(lwb)login=parseLogin(lwb);const existingC=new Map(DATA.customer.map((x,i)=>[clean(x.session_id),i]).filter(([k])=>k));const existingL=new Map(DATA.login.map((x,i)=>[x.unique_key||[x.date,x.agent_email,x.slot_start,x.slot_end].join('|'),i]).filter(([k])=>k));let addedC=0,updatedC=0;customer.forEach(r=>{const k=clean(r.session_id);if(!k)return;if(existingC.has(k)){DATA.customer[existingC.get(k)]=r;updatedC++}else{existingC.set(k,DATA.customer.length);DATA.customer.push(r);addedC++}});let addedL=0,updatedL=0;login.forEach(r=>{const k=r.unique_key||[r.date,r.agent_email,r.slot_start,r.slot_end].join('|');if(!k)return;if(existingL.has(k)){DATA.login[existingL.get(k)]=r;updatedL++}else{existingL.set(k,DATA.login.length);DATA.login.push(r);addedL++}});DATA.agents=Object.assign({},DATA.agents||{},agents);DATA.meta=Object.assign({expectedLoginHours:8,expectedBreakHours:1},DATA.meta||{});saveLocal();populate();render();setStatus(`Upload complete • Added ${addedC} customer rows • Updated ${updatedC} customer rows • Added ${addedL} login rows • Updated ${updatedL} login rows • Stored locally in this browser`)}catch(e){setStatus('Upload failed: '+(e.message||e),true)}}'''
+              s = s[:start] + new_upload + s[end:]
+
+          p.write_text(s, encoding='utf-8')
+
+      - name: Commit dashboard fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+          else
+            git commit -m "Fix dashboard date display and refresh existing rows"
+            git push
+          fi
