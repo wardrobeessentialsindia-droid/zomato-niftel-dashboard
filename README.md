@@ -9,7 +9,9 @@ This version has **no Apps Script, no API routes, and no environment variables**
 4. Upload the login CSV in Login / Workforce Dump.
 5. Click **Upload & Process**.
 
-The browser parses the files using SheetJS and stores the processed dashboard data in browser local storage. Duplicate customer rows are skipped by `session_id`; duplicate login rows are skipped by date + agent + slot.
+The browser parses the files using SheetJS and stores the processed dashboard data in browser local storage. Duplicate customer rows are updated by `session_id`; duplicate login rows are updated by date + agent + slot so re-uploading a dump can refresh corrected fields.
+
+The dashboard date parser accepts both `YYYYMMDD` source values such as `20260912` and normal Excel date values, and displays dates like `12 Sep 2026`.
 
 ## Important
 - Your source Excel/CSV files are never modified.
