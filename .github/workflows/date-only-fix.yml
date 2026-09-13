@@ -43,7 +43,7 @@ jobs:
           }'''
 
           # Replace only the existing dateKey function body.
-          s, n = re.subn(r'function dateKey\(v\)\{.*?\n\}', robust, s, count=1, flags=re.S)
+          s, n = re.subn(r'function dateKey\(v\)\{.*?\n\}', lambda m: robust, s, count=1, flags=re.S)
           if n != 1:
               raise SystemExit('dateKey function not found')
 
