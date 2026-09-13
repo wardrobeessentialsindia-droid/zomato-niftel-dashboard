@@ -13,39 +13,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply branding and dashboard UI
-        shell: bash
+      - name: Keep official branding without legacy dark UI
+        shell: python
         run: |
-          python - <<'PYCODE'
           from pathlib import Path
           p=Path('index.html')
-          s=p.read_text()
-          repls={
-          '<title>Zomato Operations Control Tower</title>':'<title>Zomato Niftel Dashboard</title>',
-          '<h1>Zomato Operations Control Tower</h1>':'<h1>Zomato Niftel Dashboard</h1>',
-          'Operations • Quality • Refund • Workforce • Agent 360':'Customer Support Performance &amp; Operations Analytics',
-          'Upload & Process':'Upload Files',
-          'Cloud Data Status':'Data Quality',
-          }
-          for a,b in repls.items(): s=s.replace(a,b)
-          if 'class="sidebar"' not in s:
-              s=s.replace('<header><div class="head">','''<aside class="sidebar"><div class="sidebrand"><div class="sidebrand-top">zomato</div><div class="sidebrand-name">Niftel Dashboard</div><div class="sidebrand-sub">DATA • QUALITY • PERFORMANCE</div></div><nav class="nav"><a href="#overview">Overview</a><a href="#upload">Upload Data</a><a href="#frt">FRT Dashboard</a><a href="#aht">AHT Dashboard</a><a href="#refund">Refund Dashboard</a><a href="#inflow-section">Inflow Dashboard</a><a href="#quality-section">DSAT / CSAT</a><a href="#node-section">Inflow vs DSAT</a><a href="#refund">Inflow vs Refund</a><a href="#node-section">Node Intelligence</a><a href="#agent360">Agent 360</a><a href="#workforce">Workforce</a><a href="#agent360">Coaching</a><a href="#data-quality">Data Quality</a><a href="#exports">Exports</a></nav></aside><header class="main-header"><div class="head">''')
-              s=s.replace('</div></header>\n<main>','<div class="data-status" id="headerStatus">Data Status: Ready</div></div></header>\n<main>')
-          s=s.replace('<section class="panel"><div class="uploadgrid">','<section class="panel" id="upload"><div class="section-eyebrow">UPLOAD DATA</div><div class="upload-head"><h2>Upload your raw dump</h2><p>Upload your Excel or CSV files and the dashboard will automatically read, process and calculate the required metrics.</p></div><div class="uploadgrid">',1)
-          s=s.replace('<section class="panel filters">','<section class="panel filters" id="overview">',1)
-          s=s.replace('<div class="card chartcard"><div id="inflow" class="chart"></div></div><div class="card chartcard"><div id="speed" class="chart"></div></div>','<div class="card chartcard" id="inflow-section"><div id="inflow" class="chart"></div></div><div class="card chartcard" id="frt"><div id="speed" class="chart"></div></div>',1)
-          s=s.replace('<div class="card chartcard"><div id="nodeDsat" class="chart"></div></div><div class="card chartcard"><div id="nodeRefund" class="chart"></div></div>','<div class="card chartcard" id="node-section"><div id="nodeDsat" class="chart"></div></div><div class="card chartcard" id="refund"><div id="nodeRefund" class="chart"></div></div>',1)
-          s=s.replace('<div class="card chartcard"><div id="login" class="chart"></div></div><div class="card chartcard"><div id="quality" class="chart"></div></div>','<div class="card chartcard" id="workforce"><div id="login" class="chart"></div></div><div class="card chartcard" id="quality-section"><div id="quality" class="chart"></div></div>',1)
-          s=s.replace('<div class="sectiontitle"><h2>Agent 360</h2>','<div class="sectiontitle" id="agent360"><h2>Agent 360</h2>',1)
-          css='''<style id="niftel-branding">:root{--bg:#071016;--card:rgba(15,25,33,.88);--line:rgba(255,255,255,.09);--ink:#eef5f7;--muted:#91a0a7;--red:#e23744;--cyan:#2de2e6}body{background:radial-gradient(circle at 80% -10%,rgba(226,55,68,.18),transparent 32%),radial-gradient(circle at 15% 20%,rgba(45,226,230,.07),transparent 25%),var(--bg);color:var(--ink);padding-left:260px}.sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;padding:26px 18px;background:rgba(5,12,17,.97);border-right:1px solid var(--line);z-index:30}.sidebrand{padding:0 14px 24px;border-bottom:1px solid var(--line);margin-bottom:16px}.sidebrand-top{font-size:25px;font-weight:900}.sidebrand-name{font-size:18px;font-weight:800}.sidebrand-sub{font-size:9px;letter-spacing:1.2px;color:var(--cyan);margin-top:7px;font-weight:800}.nav{display:flex;flex-direction:column;gap:3px;overflow:auto;max-height:calc(100vh - 150px)}.nav a{color:#b7c2c7;text-decoration:none;font-size:12px;font-weight:650;padding:10px 12px;border-radius:9px}.nav a:hover{background:rgba(226,55,68,.12);color:#fff}.main-header{position:sticky;top:0;z-index:20;background:rgba(7,16,22,.86);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:18px 28px}.main-header .head{max-width:1800px}.main-header h1{font-size:24px}.data-status{font-size:11px;font-weight:800;color:var(--cyan);border:1px solid rgba(45,226,230,.25);background:rgba(45,226,230,.06);border-radius:999px;padding:8px 12px}.panel,.card{background:var(--card);border-color:var(--line);box-shadow:0 12px 35px rgba(0,0,0,.22)}.section-eyebrow{font-size:9px;letter-spacing:1.3px;color:var(--cyan);font-weight:900;margin-bottom:7px}.upload-head h2{margin:0;font-size:20px}.upload-head p{margin:6px 0 16px;color:var(--muted);font-size:12px}.uploadbox{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.15)}.filters select,.filters button,.btn.secondary{background:#0e1a22;color:#e6eef0;border-color:var(--line)}.kpi{background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015))}.kvalue{color:#fff}.klabel,.kmeta,.mini{color:var(--muted)}.chartcard{background:rgba(10,20,27,.78)}.tablecard{background:rgba(10,20,27,.86)}th{background:#0c171e;color:#8fa0a7}.tablewrap td{color:#dbe4e7;border-color:var(--line)}.tablewrap tr:hover{background:rgba(226,55,68,.08)}.detected{margin-top:12px;padding:12px;border:1px solid rgba(45,226,230,.2);border-radius:12px;background:rgba(45,226,230,.05);font-size:11px;color:#cfe8e9}.detected b{display:block;color:#fff;margin-bottom:6px}@media(max-width:900px){body{padding-left:0}.sidebar{position:relative;width:100%;height:auto;padding:14px}.nav{display:grid;grid-template-columns:repeat(2,1fr);max-height:none}.main-header{position:sticky}.main-header .head{align-items:flex-start}}</style>'''
-          if 'id="niftel-branding"' not in s: s=s.replace('</head>',css+'</head>',1)
-          js='''<script id="niftel-ui-patch">(function(){function ready(){var b=document.querySelector('.actions .primary');if(b)b.textContent='Upload Files';var panel=document.querySelector('#upload');if(panel&&!document.getElementById('detected')){var d=document.createElement('div');d.id='detected';d.className='detected hidden';panel.insertBefore(d,panel.querySelector('#status'));}var actions=document.querySelector('.actions');if(actions&&!document.getElementById('processBtn')){var p=document.createElement('button');p.id='processBtn';p.className='btn secondary';p.textContent='Process Data';p.onclick=function(){if(typeof uploadFiles==='function')uploadFiles()};actions.insertBefore(p,actions.children[1]);}var hs=document.getElementById('headerStatus');if(hs)hs.textContent='Data Status: Ready';var fileInputs=document.querySelectorAll('input[type=file]');fileInputs.forEach(function(inp){inp.addEventListener('change',function(){var files=Array.from(inp.files||[]);if(!files.length)return;var d=document.getElementById('detected');if(d){d.classList.remove('hidden');d.innerHTML='<b>Files Detected</b><div>'+files.map(function(f){return f.name.replace(/[&<>]/g,'')}).join('</div><div>')+'</div>';}})});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready);else ready();})();</script>'''
-          if 'id="niftel-ui-patch"' not in s: s=s.replace('</body>',js+'</body>',1)
-          p.write_text(s)
-          PYCODE
-      - name: Commit changes
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('<title>Zomato Operations Control Tower</title>','<title>Zomato Niftel Dashboard</title>')
+          s=s.replace('Zomato Operations Control Tower','Zomato Niftel Dashboard')
+          s=s.replace('Operations • Quality • Refund • Workforce • Agent 360','Customer Support Performance &amp; Operations Analytics')
+          p.write_text(s,encoding='utf-8')
+      - name: Commit branding
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          if git diff --cached --quiet; then echo "No changes needed"; else git commit -m "Apply Zomato Niftel Dashboard branding"; git push; fi
+          if git diff --cached --quiet; then echo "No changes needed"; else git commit -m "Keep Niftel branding clean"; git push; fi
