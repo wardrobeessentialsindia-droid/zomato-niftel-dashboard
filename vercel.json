@@ -1,6 +1,21 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/overview", "destination": "/shell.html" },
+    { "source": "/upload", "destination": "/shell.html" },
+    { "source": "/data-quality", "destination": "/shell.html" },
+    { "source": "/raw-explorer", "destination": "/shell.html" },
+    { "source": "/frt", "destination": "/shell.html" },
+    { "source": "/aht", "destination": "/shell.html" },
+    { "source": "/inflow", "destination": "/shell.html" },
+    { "source": "/refund", "destination": "/shell.html" },
+    { "source": "/dsat-csat", "destination": "/shell.html" },
+    { "source": "/inflow-vs-dsat", "destination": "/shell.html" },
+    { "source": "/inflow-vs-refund", "destination": "/shell.html" },
+    { "source": "/node-intelligence", "destination": "/shell.html" },
+    { "source": "/agent-360", "destination": "/shell.html" },
+    { "source": "/workforce", "destination": "/shell.html" },
+    { "source": "/coaching", "destination": "/shell.html" },
+    { "source": "/exports", "destination": "/shell.html" }
   ]
 }
