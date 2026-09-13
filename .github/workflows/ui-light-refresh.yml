@@ -1,0 +1,205 @@
+name: Light enterprise UI refresh
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply visual-only refresh
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          if 'id="light-enterprise-ui"' not in s:
+              css = r'''<style id="light-enterprise-ui">
+:root{
+  --bg:#F6F8FA;
+  --card:#FFFFFF;
+  --line:#E7EAEE;
+  --ink:#17202A;
+  --muted:#667085;
+  --red:#E23744;
+  --red2:#F05A64;
+  --cyan:#00A98F;
+  --good:#16834B;
+  --warn:#B7791F;
+}
+html{background:#F6F8FA}
+body{
+  background:#F6F8FA!important;
+  color:#17202A!important;
+  padding-left:248px;
+  font-family:Inter,Arial,sans-serif;
+}
+.sidebar{
+  width:248px;
+  padding:20px 14px;
+  background:#FFFFFF!important;
+  border-right:1px solid #E7EAEE!important;
+  box-shadow:2px 0 14px rgba(23,32,42,.04);
+}
+.sidebrand{
+  padding:4px 12px 18px;
+  border-bottom:1px solid #E7EAEE!important;
+  margin-bottom:12px;
+}
+.sidebrand-top{font-size:23px;font-weight:900;color:#17202A}
+.sidebrand-name{font-size:17px;font-weight:800;color:#17202A}
+.sidebrand-sub{color:#667085!important;letter-spacing:1px;font-size:8px}
+.nav{gap:8px;max-height:calc(100vh - 128px)}
+.nav-group{gap:2px}
+.nav-label{color:#98A2B3!important;padding:9px 11px 4px;font-size:9px}
+.nav a{
+  color:#475467!important;
+  padding:9px 11px;
+  border-radius:9px;
+  font-size:12px;
+  font-weight:650;
+  transition:background .15s ease,color .15s ease,transform .15s ease;
+}
+.nav a:hover{background:#FFF1F2!important;color:#E23744!important;transform:translateX(1px)}
+.nav a:focus,.nav a:active{background:#FFF1F2!important;color:#E23744!important}
+.main-header{
+  background:rgba(255,255,255,.96)!important;
+  color:#17202A!important;
+  border-bottom:1px solid #E7EAEE!important;
+  box-shadow:0 2px 12px rgba(23,32,42,.04)!important;
+  backdrop-filter:blur(12px);
+  padding:14px 24px;
+}
+.main-header h1{color:#17202A!important;font-size:22px}
+.main-header .sub{color:#667085!important;opacity:1}
+.logo{background:#FFF1F2!important;color:#E23744!important;box-shadow:none!important;border:1px solid #FFD9DD;font-size:14px}
+.live{background:#F8FAFC!important;color:#667085!important;border:1px solid #E7EAEE!important}
+.data-status{color:#00856F!important;background:#ECFDF8!important;border-color:#B7E9DE!important}
+main{padding:18px 22px 40px}
+.panel,.card{
+  background:#FFFFFF!important;
+  border:1px solid #E7EAEE!important;
+  box-shadow:0 4px 18px rgba(23,32,42,.05)!important;
+  border-radius:14px;
+  backdrop-filter:none;
+}
+.filters{padding:12px 14px}
+.filterlabel{color:#667085!important}
+.filters select,.filters button,.btn.secondary{
+  background:#FFFFFF!important;
+  color:#344054!important;
+  border:1px solid #DDE2E8!important;
+  box-shadow:none!important;
+}
+.filters select:focus,.filters button:focus{outline:2px solid #FAD0D4;outline-offset:1px}
+.btn{border-radius:9px}
+.primary{background:#E23744!important;color:#FFFFFF!important;box-shadow:0 2px 5px rgba(226,55,68,.16)}
+.secondary:hover,.filters button:hover{background:#F8FAFC!important}
+.kpis{grid-template-columns:repeat(8,minmax(145px,1fr));gap:12px}
+.kpi{
+  background:#FFFFFF!important;
+  border:1px solid #E7EAEE!important;
+  box-shadow:0 3px 12px rgba(23,32,42,.045)!important;
+  border-radius:14px;
+  padding:14px;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.kpi:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(23,32,42,.07)!important}
+.klabel{color:#667085!important;font-size:9px}
+.kvalue{color:#17202A!important;font-size:24px}
+.kmeta{color:#98A2B3!important}
+.sectiontitle{margin:22px 0 9px}
+.sectiontitle h2{color:#17202A;font-size:16px}
+.sectiontitle span{color:#98A2B3!important}
+.chartcard{padding:8px;min-height:370px;background:#FFFFFF!important}
+.chart{height:350px}
+.tablecard{background:#FFFFFF!important}
+.tablehead{border-bottom:1px solid #E7EAEE!important}
+.tablehead b{color:#17202A}
+.tablewrap table{background:#FFFFFF}
+th{background:#F8FAFC!important;color:#667085!important;border-bottom:1px solid #E7EAEE!important}
+td{color:#344054!important;border-bottom:1px solid #EEF1F4!important}
+tbody tr:hover{background:#FFF7F7!important}
+.badge{background:#F2F4F7!important;color:#475467}
+.good{color:#16834B!important}.warn{color:#B7791F!important}.danger{color:#C51F31!important}
+.empty{color:#667085!important}
+.status,.mini{color:#667085!important}
+.upload-page-shell{padding:20px 22px 40px}
+.upload-page-card{max-width:1060px}
+.upload-page-card .uploadbox,.drop-zone{background:#F8FAFC!important;border:1px dashed #D6DCE3!important;color:#667085!important}
+.drop-zone b{color:#17202A!important}
+.upload-meta .meta-card,.process-card{background:#FFFFFF!important;border:1px solid #E7EAEE!important}
+.meta-card small{color:#98A2B3!important}.meta-card strong{color:#17202A!important}
+.stage{background:#F8FAFC!important;color:#667085!important}
+.stage.active{background:#FFF1F2!important;color:#E23744!important;border-color:#F6B8BE!important}
+.stage.done{color:#16834B!important}
+.upload-success{background:#ECFDF3!important;border-color:#B7E4C7!important;color:#167047!important}
+.detected{background:#F0FDFA!important;border-color:#B7E9DE!important;color:#475467!important}
+.detected b{color:#17202A!important}
+.section-eyebrow{color:#E23744!important}
+.error{color:#B42318!important}
+@media(max-width:1300px){.kpis{grid-template-columns:repeat(4,minmax(145px,1fr))}}
+@media(max-width:1050px){body{padding-left:0}.sidebar{position:relative;width:100%;height:auto;box-shadow:none;padding:12px 14px}.nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-height:none}.nav-group{min-width:0}.main-header{position:sticky}.kpis{grid-template-columns:repeat(4,minmax(135px,1fr))}}
+@media(max-width:700px){.nav{grid-template-columns:repeat(2,minmax(0,1fr))}.main-header{padding:12px 14px}.main-header .head{gap:10px}.main-header h1{font-size:19px}.live{display:none}main{padding:12px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.kvalue{font-size:21px}.charts{grid-template-columns:1fr}.chartcard{min-height:330px}.chart{height:310px}}
+</style>'''
+              s = s.replace('</head>', css + '</head>', 1)
+
+          # Apply a light Plotly theme without changing any data, calculations, or chart structure.
+          if 'id="light-plotly-ui"' not in s:
+              js = r'''<script id="light-plotly-ui">
+(function(){
+  if(!window.Plotly || window.__lightPlotlyPatched)return;
+  window.__lightPlotlyPatched=true;
+  const original=Plotly.newPlot;
+  const merge=(a,b)=>Object.assign({},a||{},b||{});
+  Plotly.newPlot=function(gd,data,layout,config){
+    const l=merge(layout,{
+      paper_bgcolor:'#FFFFFF',plot_bgcolor:'#FFFFFF',
+      font:merge({color:'#344054',family:'Inter,Arial,sans-serif'},layout&&layout.font),
+      xaxis:merge({gridcolor:'#EEF1F4',zerolinecolor:'#E7EAEE',linecolor:'#DDE2E8',tickfont:{color:'#667085'}},layout&&layout.xaxis),
+      yaxis:merge({gridcolor:'#EEF1F4',zerolinecolor:'#E7EAEE',linecolor:'#DDE2E8',tickfont:{color:'#667085'}},layout&&layout.yaxis),
+      legend:merge({font:{color:'#475467'}},layout&&layout.legend)
+    });
+    return original.call(this,gd,data,l,config);
+  };
+})();
+</script>'''
+              s = s.replace('</body>', js + '</body>', 1)
+
+          p.write_text(s, encoding='utf-8')
+
+      - name: Validate JavaScript
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          js='\n'.join(re.findall(r'<script(?: [^>]*)?>(.*?)</script>',s,re.S))
+          Path('/tmp/dashboard.js').write_text(js,encoding='utf-8')
+          PY
+          node --check /tmp/dashboard.js
+
+      - name: Commit visual refresh
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No UI changes needed"
+          else
+            git commit -m "Refresh dashboard with light enterprise UI"
+            git push
+          fi
