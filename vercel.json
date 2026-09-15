@@ -1,7 +1,9 @@
 {
   "version": 2,
+  "redirects": [
+    { "source": "/", "destination": "/shell.html", "permanent": false }
+  ],
   "rewrites": [
-    { "source": "/", "destination": "/shell.html" },
     { "source": "/overview", "destination": "/shell.html" },
     { "source": "/upload", "destination": "/shell.html" },
     { "source": "/data-quality", "destination": "/shell.html" },
