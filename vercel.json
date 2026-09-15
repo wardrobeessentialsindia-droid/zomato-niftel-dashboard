@@ -1,6 +1,7 @@
 {
   "version": 2,
   "rewrites": [
+    { "source": "/", "destination": "/shell.html" },
     { "source": "/overview", "destination": "/shell.html" },
     { "source": "/upload", "destination": "/shell.html" },
     { "source": "/data-quality", "destination": "/shell.html" },
