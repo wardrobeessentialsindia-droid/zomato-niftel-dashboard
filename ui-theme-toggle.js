@@ -37,12 +37,12 @@ body.niftel-dark #${BTN_ID} .logout{background:#e23744;border-color:#e23744}
     let box=doc.getElementById(BTN_ID);
     if(!box){
       box=doc.createElement('div');box.id=BTN_ID;
-      box.innerHTML='<button id="niftelThemeBtn" type="button">🌙 Dark</button><button id="niftelLogoutBtn" class="logout" type="button">Logout</button>';
+      box.innerHTML='<button id="niftelThemeBtn" type="button">☀️ Light</button><button id="niftelLogoutBtn" class="logout" type="button">Logout</button>';
       doc.body.appendChild(box);
       doc.getElementById('niftelThemeBtn').onclick=toggle;
       doc.getElementById('niftelLogoutBtn').onclick=logout;
     }
-    const saved=localStorage.getItem('niftel-theme')||'light';
+    const saved=localStorage.getItem('niftel-theme')||'dark';
     apply(saved);
   }
   function apply(mode){
@@ -50,7 +50,7 @@ body.niftel-dark #${BTN_ID} .logout{background:#e23744;border-color:#e23744}
     doc.body.classList.toggle('niftel-dark',mode==='dark');
     const b=doc.getElementById('niftelThemeBtn');if(b)b.textContent=mode==='dark'?'☀️ Light':'🌙 Dark';
   }
-  function toggle(){const next=(localStorage.getItem('niftel-theme')||'light')==='dark'?'light':'dark';localStorage.setItem('niftel-theme',next);apply(next)}
+  function toggle(){const next=(localStorage.getItem('niftel-theme')||'dark')==='dark'?'light':'dark';localStorage.setItem('niftel-theme',next);apply(next)}
   async function logout(){
     const b=iframe?.contentWindow?.document?.getElementById('niftelLogoutBtn');if(b){b.disabled=true;b.textContent='Logging out…'}
     try{if(db)await db.auth.signOut()}catch(e){console.warn('Logout',e)}
